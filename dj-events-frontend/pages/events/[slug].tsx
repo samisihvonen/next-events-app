@@ -1,20 +1,35 @@
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 import Image from 'next/image';
 import {FaPencilAlt,FaTimes} from 'react-icons/fa'
 import {API_URL} from '@/config/index'
 import Layout from '@/components/Layout'
-import { NextPage } from 'next';
 import styles from '@/styles/Event.module.css'
 import { Event, ParamsType } from '../../types/event';
+import {useRouter} from 'next/router'
+
 
 interface Props {
   evt: Event
 }
 
 export default function EventPage({ evt }: Props) {
+const router = useRouter()
+  const deleteEvent = async (e: any) => {
+    if(confirm("Are you sure?")){
+      const res = await fetch(`${API_URL}/api/events/${evt.id}`,{
+        method: 'DELETE'
+      })
 
-  const deleteEvent = (e: any) => {
-    console.log('delete')
+      const data  = await res.json()
+
+      if(!res.ok){
+        toast.error(data.message)
+      }else{
+        router.push('/events')
+      }
+    }
   }
 
   return (
@@ -33,6 +48,7 @@ export default function EventPage({ evt }: Props) {
           {new Date(evt.attributes.date as string).toLocaleDateString('fi-FI')} at {evt.attributes.time}
         </span>
         <h1>{evt.attributes.name}</h1>
+        <ToastContainer/>
         {evt.attributes.image && (
           <div className={styles.image}>
             <Image src={evt.attributes.image ? evt.attributes.image.data.attributes.formats.medium.url : ("/images/event-default.png" as any)}

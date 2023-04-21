@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import EventItem from '@/components/EventItem';
 import { API_URL } from '@/config/index';
-import { Event, Props, ResponseData } from "@/types/event";
+import { Event, ResponseData } from "@/types/event";
 import Layout from '@/components/Layout';
 
 

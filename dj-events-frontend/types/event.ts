@@ -22,9 +22,45 @@ export interface Event {
           }
         }
       }
-
     };
   }
+}
+export type EventImage = {
+       data: {
+        attributes: {
+          formats: {
+            medium: {
+              url: String
+            }
+            thumbnail: {
+              url: String
+            }
+          }
+        }
+      }
+};
+
+export interface AddEventForm {
+  name: string;
+  performers: string;
+  venue: string;
+  address: string;
+  date: string;
+  time: string;
+  description: string;
+}
+
+
+export interface EditEventForm {
+  id: string;
+  image: any;
+  name: string;
+  performers: string;
+  venue: string;
+  address: string;
+  date: string;
+  time: string;
+  description: string;
 }
 
 export interface ResponseData {
@@ -37,21 +73,4 @@ export interface ResponseData {
       total: Number
     }
   }
-}
-
-export interface Props {
-  events: Event[];
-}
-
-
-export type QueryType = {
-  query: Slug
-}
-
-export type ParamsType = {
-  params: Slug
-}
-
-export type Slug = {
-  slug: String
 }

@@ -1,28 +1,51 @@
 import Layout from "@/components/Layout";
 import EventItem from "@/components/EventItem";
-import { API_URL } from "@/config/index";
-import { EventType, Props, ResponseData } from "@/types/event";
+import { API_URL, PER_PAGE } from "@/config/index";
+import { Event } from "@/types/event";
+import { GetServerSideProps } from "next";
+import Pagination from "@/components/Pagination";
+import Link from "next/link";
 
-export default function EventsPage({ events }: any) {
+interface EventsPageProps {
+  events: Event[];
+  page: number;
+  total: number;
+}
+export default function EventsPage({ events, page, total }: EventsPageProps) {
+
+  const lastPage = Math.ceil(total/PER_PAGE)
 
   return (
     <Layout>
-      <h1>Events</h1>
-      {events.data.length === 0 && <h3>No events to show</h3>}
+      <>
+        <h1>Events</h1>
+        {events.length === 0 && <h3>No events to show.</h3>}
 
-      {events.data.map((evt: EventType) => (
-        <EventItem key={evt.id + ""} evt={evt} />
-      ))}
+        {events.map((evt:any) => (
+          <EventItem key={evt.id} evt={evt} />
+        ))}
+        <Pagination page={page} total={total} />
+      </>
     </Layout>
   );
 }
 
-export async function getStaticProps() {
-  const res = await fetch(`${API_URL}/api/events?populate=*&_sort=date:ASC`);
-  const events: ResponseData = await res.json();
+export const getServerSideProps: GetServerSideProps = async ({
+  query: { page = 1 },
+}) => {
+  const start = +page === 1 ? 0 : (+page - 1) * PER_PAGE;
+
+  // Fetch events from the server
+  const totalRes = await fetch(`${API_URL}/api/events/count`);
+  const total = await totalRes.json();
+
+  // Fetch events from the server
+  const eventRes = await fetch(
+    `${API_URL}/api/events?sort[0]=date:asc&pagination[start]=${start}&pagination[limit]=${PER_PAGE}&populate=*`
+  );
+  const { data: events }: { data:Event[] } = await eventRes.json();
 
   return {
-    props: { events },
-    revalidate: 1
+    props: { events, page: +page, total },
   };
-}
+};
